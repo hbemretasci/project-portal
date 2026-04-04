@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tedarik Zinciri Proje Portalı</title>
+    <!-- Modern Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- SheetJS for Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <!-- Google Charts for Gantt -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="layout-dashboard"></i>
+                <h2>Proje Portalı</h2>
+            </div>
+            <ul class="nav-list" id="nav-list">
+                <li class="nav-item active" id="nav-home" onclick="goHome()">
+                    <i data-lucide="home"></i> Ana Sayfa
+                </li>
+                <!-- Departments Injected Here -->
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header" id="top-header">
+                <h1>Kaleseramik Tedarik Zinciri Yönetimi Proje Portalı</h1>
+            </header>
+
+            <!-- Page 1: Overview Grid (Tiles) -->
+            <section class="page page-active" id="page-overview">
+                <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1>Departman Özeti</h1>
+                        <p>Departman bazında devam eden projeleri ve genel durumu görüntüleyin.</p>
+                    </div>
+                    <div id="overview-header-stats" class="header-stats-container"></div>
+                </div>
+                <div class="grid-container" id="overview-grid">
+                    <!-- Tiles injected here -->
+                </div>
+            </section>
+
+            <!-- Page 2: Department Detail -->
+            <section class="page" id="page-department">
+                <div class="department-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <button class="btn-icon" onclick="goHome()">
+                            <i data-lucide="arrow-left"></i> Geri Dön
+                        </button>
+                        <div>
+                            <h1 id="dept-title">Departman</h1>
+                            <p id="dept-subtitle">Fonksiyonlara göre proje detayları ve takvim.</p>
+                        </div>
+                    </div>
+                    <div id="dept-header-stats" class="header-stats-container"></div>
+                </div>
+
+                <div class="functions-tabs" id="functions-tabs">
+                    <!-- Function tabs injected here -->
+                </div>
+
+                <div class="department-body">
+                    <div class="project-list" id="project-list">
+                        <!-- Projects injected here -->
+                    </div>
+                    
+                    <div class="project-gantt">
+                        <div id="gantt_chart" style="width: 100%; height: 100%; min-height: 400px;"></div>
+                        <div id="gantt_empty" style="display: none; height: 100%; align-items: center; justify-content: center; color: var(--text-muted); padding: 40px;">
+                            <div style="text-align: center;">
+                                <i data-lucide="calendar-x" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                                <p>Bu görünüm için geçerli tarihli proje bulunamadı.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Project Detail Modal -->
+    <div id="project-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeProjectModal()"><i data-lucide="x"></i></button>
+            <div class="modal-header">
+                <h2 id="modal-title">Proje Adı</h2>
+                <div class="modal-meta" id="modal-meta">Grup / Tarih</div>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-section" id="modal-desc-section">
+                    <h3><i data-lucide="align-left"></i> Proje Açıklaması</h3>
+                    <p id="modal-desc"></p>
+                </div>
+                
+                <div class="modal-section" id="modal-done-section">
+                    <h3><i data-lucide="check-circle-2"></i> Tamamlanan Adımlar (Done List)</h3>
+                    <div id="modal-done"></div>
+                </div>
+                
+                <div class="modal-section" id="modal-todo-section">
+                    <h3><i data-lucide="list-todo"></i> Planlanan Adımlar (To-do List)</h3>
+                    <div id="modal-todo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>
