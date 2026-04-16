@@ -3,6 +3,8 @@ const STATE = {
     projects: [],
     departments: [],
     functionMap: {}, // dept -> Set of functions
+    deptOrderMap: {}, // dept -> order
+    funcOrderMap: {}, // funcKey -> order
     deptDevamCount: {}, // dept -> count of 'Devam Ediyor'
     statuses: {
         'Başlamadı': { color: 'var(--color-baslamadi)', count: 0 },
@@ -90,6 +92,8 @@ function parseData(data) {
     STATE.projects = data;
     
     const dSet = new Set();
+    STATE.deptOrderMap = {};
+    STATE.funcOrderMap = {};
     
     data.forEach(row => {
         // Safe access ignoring undefined
@@ -97,12 +101,29 @@ function parseData(data) {
         const func = row.function ? row.function.trim() : "Genel";
         const status = row.project_status ? row.project_status.trim() : "Başlamadı";
         
+        // Parse Orders
+        const deptOrder = parseInt(row['department order']);
+        const funcOrder = parseInt(row['function order']);
+        
         // Departments tracking
         dSet.add(dept);
+        if (!isNaN(deptOrder)) {
+            // Eğer aynı departman için birden fazla satır varsa ve sıra yazılmışsa en küçüğünü/ilkini alalım:
+            if (!(dept in STATE.deptOrderMap) || deptOrder < STATE.deptOrderMap[dept]) {
+                STATE.deptOrderMap[dept] = deptOrder;
+            }
+        }
         
         // Functions tracking
         if (!STATE.functionMap[dept]) STATE.functionMap[dept] = new Set();
         STATE.functionMap[dept].add(func);
+        
+        const funcKey = dept + '_' + func;
+        if (!isNaN(funcOrder)) {
+            if (!(funcKey in STATE.funcOrderMap) || funcOrder < STATE.funcOrderMap[funcKey]) {
+                STATE.funcOrderMap[funcKey] = funcOrder;
+            }
+        }
         
         // Status tracking
         let matchedStatus = Object.keys(STATE.statuses).find(k => status.toLowerCase().includes(k.toLowerCase()));
@@ -117,7 +138,12 @@ function parseData(data) {
         }
     });
 
-    STATE.departments = Array.from(dSet).sort();
+    // Departmanları sıra numarasına göre (sıra numarası yoksa alfabetik olarak sona) diziyoruz
+    STATE.departments = Array.from(dSet).sort((a, b) => {
+        const orderA = STATE.deptOrderMap[a] !== undefined ? STATE.deptOrderMap[a] : 9999;
+        const orderB = STATE.deptOrderMap[b] !== undefined ? STATE.deptOrderMap[b] : 9999;
+        return orderA - orderB || a.localeCompare(b);
+    });
 }
 
 // === RENDERERS ===
@@ -271,7 +297,14 @@ function goToDepartment(dept) {
 function renderFunctionsTabs() {
     const container = document.getElementById('functions-tabs');
     const funcs = Array.from(STATE.functionMap[STATE.activeDepartment] || []);
-    funcs.sort();
+    
+    funcs.sort((a, b) => {
+        const keyA = STATE.activeDepartment + '_' + a;
+        const keyB = STATE.activeDepartment + '_' + b;
+        const orderA = STATE.funcOrderMap[keyA] !== undefined ? STATE.funcOrderMap[keyA] : 9999;
+        const orderB = STATE.funcOrderMap[keyB] !== undefined ? STATE.funcOrderMap[keyB] : 9999;
+        return orderA - orderB || a.localeCompare(b);
+    });
     
     if (funcs.length > 0 && !STATE.activeFunction) {
         STATE.activeFunction = funcs[0]; // default select first
